@@ -28,7 +28,7 @@ public class UserController {
         return ResponseEntity.ok("Welcome! This endpoint is not secure.");
     }
 
-   
+    
     @GetMapping("/user/profile")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UserResponse> getUserProfile(Principal principal) {
@@ -36,7 +36,6 @@ public class UserController {
         return ResponseEntity.ok(profile);
     }
     
-   
     @PutMapping("/user/profile")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UserResponse> updateUserProfile(
@@ -53,7 +52,6 @@ public class UserController {
         return ResponseEntity.ok(updatedProfile);
     }
     
- 
     @DeleteMapping("/user/profile")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Map<String, String>> deleteUserProfile(Principal principal) {
@@ -69,7 +67,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-
     @GetMapping("/user/dashboard")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Map<String, Object>> userDashboard(Principal principal) {
@@ -83,6 +80,7 @@ public class UserController {
     }
 
    
+    
     @GetMapping("/admin/dashboard")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> adminDashboard(Principal principal) {
@@ -98,7 +96,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-
     @GetMapping("/admin/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
@@ -106,14 +103,12 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
     
-    
     @GetMapping("/admin/users/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId) {
         UserResponse user = userService.getUserById(userId);
         return ResponseEntity.ok(user);
     }
-    
     
     @PutMapping("/admin/users/{email}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -131,7 +126,6 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
     
-    
     @DeleteMapping("/admin/users/{email}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> deleteUserByAdmin(
@@ -144,18 +138,8 @@ public class UserController {
         response.put("message", result);
         return ResponseEntity.ok(response);
     }
+    
 
-      @GetMapping("/common/info")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<Map<String, Object>> commonInfo(Principal principal) {
-        UserResponse profile = userService.getUserProfile(principal.getName());
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Hello " + profile.getName() + "! This is accessible by any authenticated user.");
-        response.put("user", profile);
-        
-        return ResponseEntity.ok(response);
-    }
     
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException e) {

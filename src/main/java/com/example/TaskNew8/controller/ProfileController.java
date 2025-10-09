@@ -21,21 +21,20 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
-    // Get current user profile
+   
     @GetMapping
     public ResponseEntity<UserProfileResponse> getProfile() {
         User user = getCurrentUser();
         return ResponseEntity.ok(profileService.getUserProfile(user));
     }
 
-    // Update profile (first name, last name)
     @PutMapping
     public ResponseEntity<UserProfileResponse> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
         User user = getCurrentUser();
         return ResponseEntity.ok(profileService.updateProfile(user, request));
     }
 
-    // Upload profile picture
+    
     @PostMapping(value = "/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserProfileResponse> uploadProfilePicture(
             @RequestParam("file") MultipartFile file) {
@@ -43,14 +42,14 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.uploadProfilePicture(user, file));
     }
 
-    // Delete profile picture
+    
     @DeleteMapping("/picture")
     public ResponseEntity<UserProfileResponse> deleteProfilePicture() {
         User user = getCurrentUser();
         return ResponseEntity.ok(profileService.deleteProfilePicture(user));
     }
 
-    // Change password
+    
     @PutMapping("/password")
     public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
         User user = getCurrentUser();
@@ -58,7 +57,7 @@ public class ProfileController {
         return ResponseEntity.ok(message);
     }
 
-    // Helper method to get current authenticated user
+
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
