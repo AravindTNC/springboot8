@@ -20,6 +20,6 @@ public class RegisterRequest {
     @NotBlank(message = "Last name is required")
     private String lastName;
     
-    // NEW FIELD - Role in body
-    private String role;  // "USER" or "ADMIN"
+    
+    private String role;  
 }

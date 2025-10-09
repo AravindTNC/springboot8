@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity  // Enable @PreAuthorize annotations
+@EnableMethodSecurity 
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -27,16 +27,15 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             
             .authorizeHttpRequests(auth -> auth
-                    // Public endpoints
+                    
                     .requestMatchers("/auth/welcome", "/auth/register", "/auth/login", 
                                    "/auth/refreshtoken", "/auth/forgot-password", 
                                    "/auth/reset-password", "/auth/verify-email", 
                                    "/auth/resend-verification").permitAll()
                     
-                    // Profile endpoints (protected)
                     .requestMatchers("/profile/**", "/me").authenticated()
                     
-                    // All other endpoints require authentication
+                   
                     .anyRequest().authenticated()
             )
             

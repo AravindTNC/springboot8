@@ -39,14 +39,14 @@ public class RefreshTokenService {
         RefreshToken token = existingToken.get();
         token.setToken(UUID.randomUUID().toString());
         token.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
-        return refreshTokenRepository.save(token); // update
+        return refreshTokenRepository.save(token);
     } else {
         RefreshToken token = RefreshToken.builder()
                 .user(user)
                 .token(UUID.randomUUID().toString())
                 .expiryDate(Instant.now().plusMillis(refreshTokenDurationMs))
                 .build();
-        return refreshTokenRepository.save(token); // insert new
+        return refreshTokenRepository.save(token); 
     }
 }
     // public RefreshToken createRefreshToken(User user) {
@@ -80,7 +80,7 @@ public class RefreshTokenService {
         refreshTokenRepository.deleteByUser(user);
     }
 
-    // Automatic cleanup of expired tokens - runs daily at 2 AM
+   
     @Scheduled(cron = "0 0 2 * * ?")
     @Transactional
     public void deleteExpiredTokens() {

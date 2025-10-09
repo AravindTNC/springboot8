@@ -22,7 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    // Get user profile by email
+   
     public UserResponse getUserProfile(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
@@ -30,7 +30,7 @@ public class UserService {
         return convertToResponse(user);
     }
 
-    // Get user by ID
+   
     public UserResponse getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
@@ -38,18 +38,18 @@ public class UserService {
         return convertToResponse(user);
     }
 
-    // Get all users (Admin only)
+    
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
-    // Update user profile
+    
     @Transactional
     public UserResponse updateUserProfile(String email, UserUpdateRequest request, 
                                          String currentUserEmail, boolean isAdmin) {
-        // Check permission: user can only update their own profile unless they're admin
+       
         if (!email.equals(currentUserEmail) && !isAdmin) {
             throw new AccessDeniedException("You don't have permission to update this user's profile");
         }
@@ -57,7 +57,7 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        // Update fields
+        
         if (request.getFirstName() != null) {
             user.setFirstName(request.getFirstName());
         }
@@ -71,10 +71,10 @@ public class UserService {
         return convertToResponse(updatedUser);
     }
 
-    // Delete user
+    
     @Transactional
     public String deleteUser(String email, String currentUserEmail, boolean isAdmin) {
-        // Check permission: user can only delete their own account unless they're admin
+       
         if (!email.equals(currentUserEmail) && !isAdmin) {
             throw new AccessDeniedException("You don't have permission to delete this user");
         }
@@ -88,7 +88,7 @@ public class UserService {
         return "User deleted successfully: " + email;
     }
 
-    // Check if user is admin
+    
     public boolean isAdmin(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
@@ -96,7 +96,7 @@ public class UserService {
         return user.getRole().name().equals("ADMIN");
     }
 
-    // Helper method to convert User to UserResponse
+    
     private UserResponse convertToResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())

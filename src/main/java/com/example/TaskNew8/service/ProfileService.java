@@ -103,12 +103,12 @@ public class ProfileService {
 
     @Transactional
     public String changePassword(User user, ChangePasswordRequest request) {
-        // Verify current password
+        
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new RuntimeException("Current password is incorrect");
         }
 
-        // Update password
+      
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
         

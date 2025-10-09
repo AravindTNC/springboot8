@@ -21,7 +21,7 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     @Transactional
     void deleteByUser(User user);
 
-    // New method for automatic cleanup
+    
     @Modifying
     @Transactional
     int deleteByExpiryDateBefore(Instant expiryDate);
