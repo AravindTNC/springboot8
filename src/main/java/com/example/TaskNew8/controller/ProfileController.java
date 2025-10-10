@@ -1,11 +1,8 @@
 package com.example.TaskNew8.controller;
 
-import com.example.TaskNew8.dto.ChangePasswordRequest;
-import com.example.TaskNew8.dto.UpdateProfileRequest;
 import com.example.TaskNew8.dto.UserProfileResponse;
 import com.example.TaskNew8.model.User;
 import com.example.TaskNew8.service.ProfileService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,20 +18,7 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
-   
-    @GetMapping
-    public ResponseEntity<UserProfileResponse> getProfile() {
-        User user = getCurrentUser();
-        return ResponseEntity.ok(profileService.getUserProfile(user));
-    }
 
-    @PutMapping
-    public ResponseEntity<UserProfileResponse> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
-        User user = getCurrentUser();
-        return ResponseEntity.ok(profileService.updateProfile(user, request));
-    }
-
-    
     @PostMapping(value = "/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserProfileResponse> uploadProfilePicture(
             @RequestParam("file") MultipartFile file) {
@@ -42,16 +26,20 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.uploadProfilePicture(user, file));
     }
 
-    
+    @PutMapping(value = "/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserProfileResponse> updateProfilePicture(
+            @RequestParam("file") MultipartFile file) {
+        User user = getCurrentUser();
+        return ResponseEntity.ok(profileService.uploadProfilePicture(user, file));
+    }
+
     @DeleteMapping("/picture")
     public ResponseEntity<UserProfileResponse> deleteProfilePicture() {
         User user = getCurrentUser();
         return ResponseEntity.ok(profileService.deleteProfilePicture(user));
     }
 
-    
-
-
+   
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof User)) {

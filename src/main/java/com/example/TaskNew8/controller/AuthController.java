@@ -71,13 +71,13 @@ public class AuthController {
 
   
     
-    @PostMapping("/forgot-password")
+    @PostMapping("/forgotPassword")
     public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         String message = passwordResetService.initiatePasswordReset(request);
         return ResponseEntity.ok(message);
     }
 
-    @PostMapping("/reset-password")
+    @PostMapping("/resetPassword")
     public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         String message = passwordResetService.resetPassword(request);
         return ResponseEntity.ok(message);
@@ -85,13 +85,13 @@ public class AuthController {
 
 
     
-    @GetMapping("/verify-email")
+    @GetMapping("/verifyEmail")
     public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
         String message = emailVerificationService.verifyEmail(token);
         return ResponseEntity.ok(message);
     }
 
-    @PostMapping("/resend-verification")
+    @PostMapping("/resendVerification")
     public ResponseEntity<String> resendVerification(@Valid @RequestBody ResendVerificationRequest request) {
         String message = emailVerificationService.resendVerificationEmail(request.getEmail());
         return ResponseEntity.ok(message);
