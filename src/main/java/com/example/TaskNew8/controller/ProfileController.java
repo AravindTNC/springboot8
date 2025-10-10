@@ -50,12 +50,6 @@ public class ProfileController {
     }
 
     
-    @PutMapping("/password")
-    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
-        User user = getCurrentUser();
-        String message = profileService.changePassword(user, request);
-        return ResponseEntity.ok(message);
-    }
 
 
     private User getCurrentUser() {
