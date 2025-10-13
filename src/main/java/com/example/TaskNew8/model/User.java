@@ -44,14 +44,21 @@ public class User implements UserDetails {
     @Column(length = 500)
     private String verificationToken;
 
-    // NEW FIELDS FOR PROFILE PICTURE
     @Column(length = 500)
     private String profilePictureUrl;
 
     @Column(length = 255)
     private String cloudinaryPublicId;
 
-    // --- UserDetails methods ---
+    
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean twoFactorEnabled = false;
+
+    @Column(length = 32)
+    private String twoFactorSecret;
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

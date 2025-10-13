@@ -29,6 +29,7 @@ public class UserController {
     }
 
     
+    
     @GetMapping("/user/profile")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UserResponse> getUserProfile(Principal principal) {
@@ -110,36 +111,37 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
     
-    @PutMapping("/admin/users/{email}")
+   
+    @PutMapping("/admin/users/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> updateUserByAdmin(
-            @PathVariable String email,
+            @PathVariable Long userId,
             @RequestBody UserUpdateRequest updateRequest,
             Principal principal) {
         
-        UserResponse updatedUser = userService.updateUserProfile(
-            email, 
+        UserResponse updatedUser = userService.updateUserProfileById(
+            userId, 
             updateRequest, 
-            principal.getName(), 
-            true
+            principal.getName()
         );
         return ResponseEntity.ok(updatedUser);
     }
     
-    @DeleteMapping("/admin/users/{email}")
+   
+    @DeleteMapping("/admin/users/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> deleteUserByAdmin(
-            @PathVariable String email,
+            @PathVariable Long userId,
             Principal principal) {
         
-        String result = userService.deleteUser(email, principal.getName(), true);
+        String result = userService.deleteUserById(userId, principal.getName());
         
         Map<String, String> response = new HashMap<>();
         response.put("message", result);
         return ResponseEntity.ok(response);
     }
     
-
+    
     
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException e) {

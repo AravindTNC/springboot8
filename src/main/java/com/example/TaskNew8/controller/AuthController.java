@@ -96,4 +96,12 @@ public class AuthController {
         String message = emailVerificationService.resendVerificationEmail(request.getEmail());
         return ResponseEntity.ok(message);
     }
+   
+
+@PostMapping("/login/2fa")
+public ResponseEntity<AuthResponse> loginWith2FA(
+        @RequestBody LoginRequest request,
+        @RequestParam String code) {
+    return ResponseEntity.ok(authService.loginWith2FA(request, code));
+}
 }

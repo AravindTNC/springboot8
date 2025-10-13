@@ -41,7 +41,7 @@ public class EmailVerificationService {
         }
 
         user.setEmailVerified(true);
-        user.setVerificationToken(null); // Clear the token after verification
+        user.setVerificationToken(null); 
         userRepository.save(user);
 
         log.info("Email verified successfully for user: {}", user.getEmail());

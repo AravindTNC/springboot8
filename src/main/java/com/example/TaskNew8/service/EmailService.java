@@ -20,7 +20,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    // EMAIL VERIFICATION
+  
     public void sendVerificationEmail(String toEmail, String verificationToken, String baseUrl) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -34,33 +34,31 @@ public class EmailService {
             
             String htmlContent = String.format("""
                 <html>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                        <h2 style="color: #2196F3;">Welcome to TaskNew8!</h2>
-                        <p>Hello,</p>
-                        <p>Thank you for registering with TaskNew8. Please verify your email address to complete your registration.</p>
-                        <div style="text-align: center; margin: 30px 0;">
-                            <a href="%s" 
-                               style="background-color: #2196F3; color: white; padding: 12px 30px; 
-                                      text-decoration: none; border-radius: 5px; display: inline-block;">
-                                Verify Email Address
-                            </a>
-                        </div>
-                        <p style="color: #666; font-size: 14px;">
-                            Or copy and paste this link into your browser:<br>
-                            <a href="%s">%s</a>
-                        </p>
-                        <p style="color: #666; font-size: 14px;">
-                            If you did not create an account, please ignore this email.
-                        </p>
-                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                        <p style="color: #999; font-size: 12px;">
-                            Best regards,<br>
-                            TaskNew8 Team
-                        </p>
-                    </div>
-                </body>
-                </html>
+<body>
+    <div>
+        <h2>Welcome to TaskNew8!</h2>
+        <p>Hello,</p>
+        <p>Thank you for registering with TaskNew8. Please verify your email address to complete your registration.</p>
+        <div>
+            <a href="%s">
+                Verify Email Address
+            </a>
+        </div>
+        <p>
+            Or copy and paste this link into your browser:<br>
+            <a href="%s">%s</a>
+        </p>
+        <p>
+            If you did not create an account, please ignore this email.
+        </p>
+        <hr>
+        <p>
+            Best regards,<br>
+            TaskNew8 Team
+        </p>
+    </div>
+</body>
+</html>
                 """, verificationUrl, verificationUrl, verificationUrl);
             
             helper.setText(htmlContent, true);
@@ -74,7 +72,7 @@ public class EmailService {
         }
     }
 
-    // PASSWORD RESET
+   
     public void sendPasswordResetEmail(String toEmail, String resetToken, String baseUrl) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

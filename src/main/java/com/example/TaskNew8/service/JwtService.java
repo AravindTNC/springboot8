@@ -36,7 +36,7 @@ public class JwtService {
         return Jwts
                 .builder()
                 .claims(extraClaims)
-                .subject(userDetails.getUsername()) // Email is the subject
+                .subject(userDetails.getUsername()) 
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey(), Jwts.SIG.HS256)

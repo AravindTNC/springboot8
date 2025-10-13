@@ -48,7 +48,7 @@ public class ProfileService {
 
     @Transactional
     public UserProfileResponse uploadProfilePicture(User user, MultipartFile file) {
-        // Validate file
+        
         if (file.isEmpty()) {
             throw new RuntimeException("File is empty");
         }
@@ -61,18 +61,18 @@ public class ProfileService {
             throw new RuntimeException("File size must not exceed 5MB");
         }
 
-        // Delete old profile picture if exists
+        
         if (user.getCloudinaryPublicId() != null) {
             cloudinaryService.deleteImage(user.getCloudinaryPublicId());
         }
 
-        // Upload new image
+       
         Map<String, Object> uploadResult = cloudinaryService.uploadImage(file);
         
         String imageUrl = (String) uploadResult.get("secure_url");
         String publicId = (String) uploadResult.get("public_id");
 
-        // Update user
+        
         user.setProfilePictureUrl(imageUrl);
         user.setCloudinaryPublicId(publicId);
         
@@ -88,10 +88,10 @@ public class ProfileService {
             throw new RuntimeException("No profile picture to delete");
         }
 
-        // Delete from Cloudinary
+       
         cloudinaryService.deleteImage(user.getCloudinaryPublicId());
 
-        // Update user
+        
         user.setProfilePictureUrl(null);
         user.setCloudinaryPublicId(null);
         

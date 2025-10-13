@@ -66,50 +66,104 @@ public class AuthService {
             .build();
 }
 
-    public AuthResponse login(LoginRequest request) {
+  
+
+private final TwoFactorService twoFactorService;
+
+
+public AuthResponse login(LoginRequest request) {
+    
+    try {
+        User userFromDb = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         
-        try {
-            User userFromDb = userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new RuntimeException("User not found with email: " + request.getEmail()));
-            
-            log.info("Attempting login for user: {}", request.getEmail());
-            log.info("User email verified: {}", userFromDb.isEmailVerified());
-            log.info("User enabled: {}", userFromDb.isEnabled());
-            log.info("User role: {}", userFromDb.getRole());
-            
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
-                    )
-            );
+        log.info("Attempting login for user: {}", request.getEmail());
+        
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
 
-            User user = (User) authentication.getPrincipal();
-            
-            if (!user.isEmailVerified()) {
-                throw new EmailNotVerifiedException("Please verify your email before logging in.");
-            }
-            
-            log.info("Login successful for user: {}", user.getEmail());
-            
-            String accessToken = jwtService.generateAccessToken(user);
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
-
-            return AuthResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken.getToken())
-                    .message("Login successful. Role: " + user.getRole())
-                    .build();
-                    
-        } catch (DisabledException e) {
-            log.error("Account disabled for user: {}", request.getEmail());
-            throw new EmailNotVerifiedException("Please verify your email before logging in.");
-        } catch (BadCredentialsException e) {
-            log.error("Bad credentials for user: {}", request.getEmail());
-            throw new RuntimeException("Invalid email or password");
-        } catch (AuthenticationException e) {
-            log.error("Authentication failed for user: {}. Error: {}", request.getEmail(), e.getMessage());
-            throw new RuntimeException("Invalid email or password");
+        User user = (User) authentication.getPrincipal();
+        
+        if (!user.isEmailVerified()) {
+            throw new EmailNotVerifiedException("Please verify your email.");
         }
+        
+       
+        if (user.isTwoFactorEnabled()) {
+            log.info("2FA required for user: {}", user.getEmail());
+            
+            return AuthResponse.builder()
+                    .requires2FA(true)
+                    .message("2FA verification required. Enter your Google Authenticator code.")
+                    .build();
+        }
+        
+        
+        String accessToken = jwtService.generateAccessToken(user);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken.getToken())
+                .requires2FA(false)
+                .message("Login successful.")
+                .build();
+                
+    } catch (BadCredentialsException e) {
+        throw new RuntimeException("Invalid email or password");
+    } catch (AuthenticationException e) {
+        throw new RuntimeException("Authentication failed");
     }
+}
+
+
+public AuthResponse loginWith2FA(LoginRequest request, String code) {
+    
+    try {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+       
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+        
+        if (!user.isEmailVerified()) {
+            throw new EmailNotVerifiedException("Please verify your email.");
+        }
+        
+        if (!user.isTwoFactorEnabled()) {
+            throw new RuntimeException("2FA not enabled");
+        }
+        
+       
+        boolean isValid = twoFactorService.verify2FACode(user, code);
+        
+        if (!isValid) {
+            throw new RuntimeException("Invalid 2FA code");
+        }
+        
+        log.info("2FA login successful for user: {}", user.getEmail());
+        
+        String accessToken = jwtService.generateAccessToken(user);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken.getToken())
+                .requires2FA(false)
+                .message("Login successful with 2FA.")
+                .build();
+                
+    } catch (BadCredentialsException e) {
+        throw new RuntimeException("Invalid email or password");
+    }
+}
 }

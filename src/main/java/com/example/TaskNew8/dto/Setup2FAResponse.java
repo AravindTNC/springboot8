@@ -9,12 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthResponse {
-    private String accessToken;
-    private String refreshToken; 
+public class Setup2FAResponse {
+    private String secret;
     private String message;
-    
-    // Add this field
-    @Builder.Default
-    private boolean requires2FA = false;
 }

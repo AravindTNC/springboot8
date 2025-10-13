@@ -26,18 +26,16 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             
-            .authorizeHttpRequests(auth -> auth
-                    
-                    .requestMatchers("/auth/welcome", "/auth/register", "/auth/login", 
-                                   "/auth/refreshtoken", "/auth/forgot-password", 
-                                   "/auth/reset-password", "/auth/verify-email", 
-                                   "/auth/resend-verification").permitAll()
-                    
-                    .requestMatchers("/profile/**", "/me").authenticated()
-                    
-                   
-                    .anyRequest().authenticated()
-            )
+          .authorizeHttpRequests(auth -> auth
+        .requestMatchers("/auth/welcome", "/auth/register", "/auth/login", 
+                       "/auth/login/2fa", "/auth/refreshtoken", "/auth/forgot-password", 
+                       "/auth/reset-password", "/auth/verify-email", 
+                       "/auth/resend-verification").permitAll()
+        
+        .requestMatchers("/profile/**", "/me", "/auth/2fa/**", "/auth/user/**", "/auth/admin/**").authenticated()
+        
+        .anyRequest().authenticated()
+)
             
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
