@@ -38,8 +38,8 @@ public class AuthService {
         throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists");
     }
     
-    // Determine role from request body, default to USER if not provided
-    Role userRole = Role.USER;  // Default
+    
+    Role userRole = Role.USER; 
     
     if (request.getRole() != null && !request.getRole().isEmpty()) {
         try {

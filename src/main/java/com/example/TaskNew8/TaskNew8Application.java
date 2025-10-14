@@ -5,7 +5,7 @@
     import org.springframework.scheduling.annotation.EnableScheduling;
 
     @SpringBootApplication
-    @EnableScheduling  // Add this annotation
+    @EnableScheduling  
     public class TaskNew8Application {
 
         public static void main(String[] args) {
