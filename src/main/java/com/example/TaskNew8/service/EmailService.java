@@ -21,6 +21,7 @@ public class EmailService {
     private String fromEmail;
 
   
+
     public void sendVerificationEmail(String toEmail, String verificationToken, String baseUrl) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

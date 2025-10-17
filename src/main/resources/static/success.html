@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OAuth Login Success</title>
+</head>
+<body>
+  <h2> OAuth Login Successful</h2>
+  <div id="tokens"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const access = params.get('accessToken');
+    const refresh = params.get('refreshToken');
+
+    document.getElementById('tokens').innerHTML = `
+      <p><b>Access Token:</b> ${access}</p>
+      <p><b>Refresh Token:</b> ${refresh}</p>
+    `;
+  </script>
+</body>
+</html>
