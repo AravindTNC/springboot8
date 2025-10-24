@@ -1,6 +1,7 @@
 package com.example.TaskNew8.config;
 
 import com.example.TaskNew8.service.JwtService;
+import com.example.TaskNew8.service.TokenBlacklistService;
 import com.example.TaskNew8.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,15 +29,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
             "/auth/register",
-            "/auth/login",
-            "/auth/refreshtoken",
-            "/auth/forgot-password",
-            "/auth/reset-password",
-            "/auth/verify-email",
-            "/auth/resend-verification"
+        "/auth/login",
+        "/auth/login/2fa",
+        "/auth/refreshtoken",
+        "/auth/forgot-password",
+        "/auth/reset-password",
+        "/auth/verify-email",          
+        "/auth/resend-verification",
+        "/auth/oauth",
+        "/oauth2",
+        "/login.html",
+        "/success.html",
+        "/error"
     );
 
     @Override
@@ -48,10 +56,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         String requestPath = request.getRequestURI();
         
-       
         log.debug("Processing request: {} {}", request.getMethod(), requestPath);
         
-       
+        // Skip JWT processing for public endpoints
         if (isPublicEndpoint(requestPath)) {
             log.debug("Public endpoint detected, skipping JWT filter: {}", requestPath);
             filterChain.doFilter(request, response);
@@ -68,6 +75,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = authHeader.substring(7);
+            
+            // Check if token is blacklisted
+            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                log.warn("Blacklisted token attempted to access: {}", requestPath);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token has been invalidated");
+                return;
+            }
+            
             final String userEmail = jwtService.extractUsername(jwt);
             
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {

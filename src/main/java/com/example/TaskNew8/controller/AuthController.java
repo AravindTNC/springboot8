@@ -4,6 +4,7 @@ import com.example.TaskNew8.dto.*;
 import com.example.TaskNew8.exception.TokenRefreshException;
 import com.example.TaskNew8.model.User;
 import com.example.TaskNew8.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
@@ -22,6 +25,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final PasswordResetService passwordResetService;
     private final EmailVerificationService emailVerificationService;
+    private final TokenBlacklistService tokenBlacklistService;
     
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -53,55 +57,69 @@ public class AuthController {
     }
     
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<String> logout(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         if (authentication != null && authentication.getPrincipal() instanceof User) {
             User user = (User) authentication.getPrincipal();
             
+            // Get token from request
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                
+                // Get token expiration
+                LocalDateTime expiresAt = jwtService.getTokenExpiration(token);
+                
+                // Blacklist the token
+                tokenBlacklistService.blacklistToken(token, expiresAt, "LOGOUT");
+            }
+            
+            // Delete refresh token
             refreshTokenService.deleteByUserId(user.getId());
             
+            // Clear security context
             SecurityContextHolder.clearContext();
             
-            return ResponseEntity.ok("Logout successful. Refresh token deleted.");
+            return ResponseEntity.ok("Logout successful. Token invalidated.");
         }
         
-        return ResponseEntity.badRequest().body("Invalid authentication or user not found.");
+        return ResponseEntity.badRequest().body("Invalid authentication.");
     }
 
-  
+    // PASSWORD RESET ENDPOINTS
     
-    @PostMapping("/forgotPassword")
+    @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         String message = passwordResetService.initiatePasswordReset(request);
         return ResponseEntity.ok(message);
     }
 
-    @PostMapping("/resetPassword")
+    @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         String message = passwordResetService.resetPassword(request);
         return ResponseEntity.ok(message);
     }
 
-
+    // EMAIL VERIFICATION ENDPOINTS
     
-    @GetMapping("/verifyEmail")
+    @GetMapping("/verify-email")
     public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
         String message = emailVerificationService.verifyEmail(token);
         return ResponseEntity.ok(message);
     }
 
-    @PostMapping("/resendVerification")
+    @PostMapping("/resend-verification")
     public ResponseEntity<String> resendVerification(@Valid @RequestBody ResendVerificationRequest request) {
         String message = emailVerificationService.resendVerificationEmail(request.getEmail());
         return ResponseEntity.ok(message);
     }
-   
 
-@PostMapping("/login/2fa")
-public ResponseEntity<AuthResponse> loginWith2FA(
-        @RequestBody LoginRequest request,
-        @RequestParam String code) {
-    return ResponseEntity.ok(authService.loginWith2FA(request, code));
-}
+    // 2FA LOGIN
+    @PostMapping("/login/2fa")
+    public ResponseEntity<AuthResponse> loginWith2FA(
+            @Valid @RequestBody LoginRequest request,
+            @RequestParam String code) {
+        return ResponseEntity.ok(authService.loginWith2FA(request, code));
+    }
 }

@@ -15,12 +15,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.TaskNew8.service.AccountLockoutService;
+import com.example.TaskNew8.repository.UserRepository;
+import com.example.TaskNew8.model.User;
+
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class UserController {
     
     private final UserService userService;
+    // And add to constructor
+private final AccountLockoutService accountLockoutService;
+private final UserRepository userRepository;
 
     
     @GetMapping("/welcome")
@@ -140,6 +148,40 @@ public class UserController {
         response.put("message", result);
         return ResponseEntity.ok(response);
     }
+
+    // Add to UserController
+
+// Unlock user account (Admin only)
+@PostMapping("/admin/users/{userId}/unlock")
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<Map<String, String>> unlockUserAccount(@PathVariable Long userId) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    
+    accountLockoutService.unlockAccount(user.getEmail());
+    
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "Account unlocked successfully for user: " + user.getEmail());
+    return ResponseEntity.ok(response);
+}
+
+// Get account lockout status (Admin only)
+@GetMapping("/admin/users/{userId}/lockout-status")
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<Map<String, String>> getLockoutStatus(@PathVariable Long userId) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    
+    String status = accountLockoutService.getLockoutStatus(user.getEmail());
+    
+    Map<String, String> response = new HashMap<>();
+    response.put("email", user.getEmail());
+    response.put("status", status);
+    response.put("failedAttempts", String.valueOf(user.getFailedLoginAttempts()));
+    response.put("locked", String.valueOf(user.isAccountLocked()));
+    
+    return ResponseEntity.ok(response);
+}
     
     
     

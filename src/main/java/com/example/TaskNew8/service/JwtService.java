@@ -8,8 +8,14 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import javax.crypto.SecretKey;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,4 +71,9 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+    public LocalDateTime getTokenExpiration(String token) {
+    Date expiration = extractClaim(token, Claims::getExpiration);
+    Instant instant = expiration.toInstant();
+    return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+}
 } 

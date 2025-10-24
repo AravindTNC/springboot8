@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
@@ -101,19 +101,30 @@ public class ProfileService {
         return getUserProfile(updatedUser);
     }
 
-    @Transactional
-    public String changePassword(User user, ChangePasswordRequest request) {
-        
-        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new RuntimeException("Current password is incorrect");
-        }
+  
 
-      
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
-        
-        log.info("Password changed for user: {}", user.getEmail());
-        
-        return "Password changed successfully";
+private final TokenBlacklistService tokenBlacklistService;
+private final JwtService jwtService;
+
+@Transactional
+public String changePassword(User user, ChangePasswordRequest request, String currentToken) {
+    // Verify current password
+    if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+        throw new RuntimeException("Current password is incorrect");
     }
+
+    // Update password
+    user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    userRepository.save(user);
+    
+    // Blacklist current token for security
+    if (currentToken != null && !currentToken.isEmpty()) {
+        LocalDateTime expiresAt = jwtService.getTokenExpiration(currentToken);
+        tokenBlacklistService.blacklistToken(currentToken, expiresAt, "PASSWORD_CHANGE");
+    }
+    
+    log.info("Password changed for user: {}", user.getEmail());
+    
+    return "Password changed successfully. Please login again with new password.";
+}
 }

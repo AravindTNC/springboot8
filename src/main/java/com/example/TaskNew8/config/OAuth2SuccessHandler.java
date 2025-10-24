@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -41,21 +42,26 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         log.info("OAuth2 login success for user: {}", email);
 
         if (email == null) {
-            log.error(" No email received from provider.");
+            log.error("No email received from OAuth provider");
             response.sendRedirect("/login.html?error=missing_email");
             return;
         }
 
         // Create or fetch existing user
         User user = userRepository.findByEmail(email).orElseGet(() -> {
+            String[] nameParts = name != null ? name.split(" ", 2) : new String[]{"", ""};
+            
             User newUser = User.builder()
                     .email(email)
-                    .firstName(name != null ? name.split(" ")[0] : "")
-                    .lastName(name != null && name.contains(" ") ? name.split(" ")[1] : "")
-                    .password("oauth2-user")
+                    .firstName(nameParts.length > 0 ? nameParts[0] : "")
+                    .lastName(nameParts.length > 1 ? nameParts[1] : "")
+                    .password("") // OAuth users don't have password
                     .role(Role.USER)
                     .emailVerified(true)
+                    .twoFactorEnabled(false)
                     .build();
+            
+            log.info("Creating new OAuth user: {}", email);
             return userRepository.save(newUser);
         });
 
@@ -63,8 +69,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtService.generateAccessToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-        log.info(" Access Token: {}", accessToken);
-        log.info(" Refresh Token: {}", refreshToken.getToken());
+        log.info("Tokens generated for OAuth user: {}", user.getEmail());
 
         // Encode tokens safely
         String encodedAccess = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
@@ -73,7 +78,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // Redirect to success page with tokens
         String redirectUrl = "/success.html?accessToken=" + encodedAccess + "&refreshToken=" + encodedRefresh;
 
-        response.setStatus(HttpServletResponse.SC_FOUND);
-        response.setHeader("Location", redirectUrl);
+        response.sendRedirect(redirectUrl);
     }
 }
