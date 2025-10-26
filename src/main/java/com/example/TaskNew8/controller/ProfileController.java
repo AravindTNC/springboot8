@@ -51,7 +51,7 @@ public class ProfileController {
         }
         return (User) authentication.getPrincipal();
     }
-    // Update in ProfileController.java
+   
 
 @PutMapping("/password")
 public ResponseEntity<String> changePassword(
@@ -60,7 +60,7 @@ public ResponseEntity<String> changePassword(
     
     User user = getCurrentUser();
     
-    // Get current token
+    
     String authHeader = httpRequest.getHeader("Authorization");
     String token = null;
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
