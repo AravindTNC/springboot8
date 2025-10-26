@@ -51,7 +51,7 @@ public class User implements UserDetails {
     @Column(length = 255)
     private String cloudinaryPublicId;
 
-    // Two-Factor Authentication
+    
     @Builder.Default
     @Column(nullable = false)
     private boolean twoFactorEnabled = false;
@@ -59,7 +59,7 @@ public class User implements UserDetails {
     @Column(length = 32)
     private String twoFactorSecret;
 
-    // NEW: Account Lockout Fields
+    
     @Builder.Default
     @Column(nullable = false)
     private int failedLoginAttempts = 0;
@@ -71,7 +71,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean accountLocked = false;
 
-    // --- UserDetails methods ---
+    
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -90,7 +90,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        // Account is not locked if accountLocked is false
+        
         return !accountLocked;
     }
 
