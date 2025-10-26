@@ -108,16 +108,16 @@ private final JwtService jwtService;
 
 @Transactional
 public String changePassword(User user, ChangePasswordRequest request, String currentToken) {
-    // Verify current password
+    
     if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
         throw new RuntimeException("Current password is incorrect");
     }
 
-    // Update password
+  
     user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     userRepository.save(user);
     
-    // Blacklist current token for security
+  
     if (currentToken != null && !currentToken.isEmpty()) {
         LocalDateTime expiresAt = jwtService.getTokenExpiration(currentToken);
         tokenBlacklistService.blacklistToken(currentToken, expiresAt, "PASSWORD_CHANGE");
