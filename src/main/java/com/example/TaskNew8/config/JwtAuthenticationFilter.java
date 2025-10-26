@@ -57,8 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestPath = request.getRequestURI();
         
         log.debug("Processing request: {} {}", request.getMethod(), requestPath);
-        
-        // Skip JWT processing for public endpoints
+       
         if (isPublicEndpoint(requestPath)) {
             log.debug("Public endpoint detected, skipping JWT filter: {}", requestPath);
             filterChain.doFilter(request, response);
@@ -76,7 +75,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             final String jwt = authHeader.substring(7);
             
-            // Check if token is blacklisted
             if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
                 log.warn("Blacklisted token attempted to access: {}", requestPath);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
