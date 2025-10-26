@@ -14,7 +14,7 @@ public class RateLimitService {
 
     private final LoadingCache<String, Bucket> rateLimitCache;
 
-    // Check if request is allowed
+   
     public boolean isAllowed(String key) {
         Bucket bucket = rateLimitCache.get(key);
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
@@ -29,13 +29,13 @@ public class RateLimitService {
         }
     }
 
-    // Get remaining requests
+   
     public long getRemainingRequests(String key) {
         Bucket bucket = rateLimitCache.get(key);
         return bucket.getAvailableTokens();
     }
 
-    // Get time until reset (in seconds)
+
     public long getSecondsUntilReset(String key) {
         Bucket bucket = rateLimitCache.get(key);
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(0);
