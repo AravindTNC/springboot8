@@ -23,7 +23,7 @@ public class TwoFactorController {
 
     private final TwoFactorService twoFactorService;
 
-    // Setup 2FA - Get secret
+    
     @PostMapping("/setup")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Setup2FAResponse> setup2FA() {
