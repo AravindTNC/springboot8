@@ -21,7 +21,7 @@ public class OAuthController {
 
     private final OAuthUserService oauthUserService;
 
-    // OAuth2 Login Success - Redirect here after OAuth provider redirects
+ 
     @GetMapping("/success")
     public ResponseEntity<OAuthUserResponse> oauthSuccess(
             @AuthenticationPrincipal OAuth2User oauth2User) {
@@ -32,7 +32,7 @@ public class OAuthController {
 
         String provider = "unknown";
         
-        // Determine provider
+      
         if (oauth2User.getAttributes().containsKey("sub")) {
             provider = "google";
         } else if (oauth2User.getAttributes().containsKey("login")) {
@@ -41,17 +41,17 @@ public class OAuthController {
 
         log.info("OAuth2 login success for provider: {}", provider);
 
-        // Process user
+        
         User user = oauthUserService.processOAuthUser(oauth2User, provider);
 
-        // Generate tokens
+      
         OAuthUserResponse response = oauthUserService.getOAuthResponse(user);
         response.setProvider(provider);
 
         return ResponseEntity.ok(response);
     }
 
-    // Initiate OAuth2 login
+
     @GetMapping("/login/google")
     public ResponseEntity<Map<String, String>> loginGoogle() {
         Map<String, String> response = new HashMap<>();
