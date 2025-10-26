@@ -29,5 +29,5 @@ public class BlacklistedToken {
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
-    private String reason; // "LOGOUT", "PASSWORD_CHANGE", "SECURITY"
+    private String reason; 
 }
