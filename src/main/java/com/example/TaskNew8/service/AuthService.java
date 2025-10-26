@@ -77,7 +77,7 @@ public class AuthService {
             User userFromDb = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             
-            // Check if account is locked
+          
             accountLockoutService.checkAccountLock(userFromDb);
             
             log.info("Attempting login for user: {}", request.getEmail());
@@ -95,10 +95,10 @@ public class AuthService {
                 throw new EmailNotVerifiedException("Please verify your email.");
             }
             
-            // Reset failed attempts on successful login
+      
             accountLockoutService.resetFailedAttempts(user.getEmail());
             
-            // If 2FA is enabled, ask for code
+ 
             if (user.isTwoFactorEnabled()) {
                 log.info("2FA required for user: {}", user.getEmail());
                 
@@ -108,7 +108,6 @@ public class AuthService {
                         .build();
             }
             
-            // Normal login if 2FA not enabled
             String accessToken = jwtService.generateAccessToken(user);
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
@@ -124,7 +123,7 @@ public class AuthService {
             throw new RuntimeException("Account is locked. Please try again later.");
         } catch (BadCredentialsException e) {
             log.error("Bad credentials for user: {}", request.getEmail());
-            // Record failed attempt
+           
             accountLockoutService.recordFailedLogin(request.getEmail());
             throw new RuntimeException("Invalid email or password");
         } catch (DisabledException e) {
@@ -143,10 +142,10 @@ public class AuthService {
             User user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             
-            // Check if account is locked
+       
             accountLockoutService.checkAccountLock(user);
             
-            // Verify credentials first
+          
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(),
@@ -162,7 +161,7 @@ public class AuthService {
                 throw new RuntimeException("2FA not enabled");
             }
             
-            // Verify 2FA code
+      
             boolean isValid = twoFactorService.verify2FACode(user, code);
             
             if (!isValid) {
@@ -170,7 +169,7 @@ public class AuthService {
                 throw new RuntimeException("Invalid 2FA code");
             }
             
-            // Reset failed attempts on successful 2FA login
+           
             accountLockoutService.resetFailedAttempts(user.getEmail());
             
             log.info("2FA login successful for user: {}", user.getEmail());
