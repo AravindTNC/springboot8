@@ -20,7 +20,6 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private final RateLimitService rateLimitService;
 
-    // Define custom HTTP status code for clarity
     private static final int SC_TOO_MANY_REQUESTS = 429;
 
     @Override
@@ -30,12 +29,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // Identify client (IP address or user email if available)
+        
         String clientKey = getClientKey(request);
 
-        // Check if the client is allowed based on rate limits
+      
         if (!rateLimitService.isAllowed(clientKey)) {
-            // Rate limit exceeded
+         
             response.setStatus(SC_TOO_MANY_REQUESTS);
             response.setContentType("application/json");
 
@@ -52,30 +51,29 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Add rate limit headers for client awareness
+    
         response.addHeader("X-RateLimit-Limit", "100");
         response.addHeader("X-RateLimit-Remaining",
                 String.valueOf(rateLimitService.getRemainingRequests(clientKey)));
 
-        // Continue with the filter chain
+    
         filterChain.doFilter(request, response);
     }
 
-    // Determine client identifier
+  
     private String getClientKey(HttpServletRequest request) {
-        // Try extracting info from Authorization header (if applicable)
+     
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            // In a real setup, parse token to extract user info (e.g., email)
-            // For simplicity, we’ll stick with IP-based rate limiting
+           
         }
 
-        // Use IP address as fallback key
+     
         String ipAddress = getClientIpAddress(request);
         return "rate_limit:" + ipAddress;
     }
 
-    // Extract client IP address safely
+  
     private String getClientIpAddress(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
