@@ -17,11 +17,11 @@ public class AccountLockoutService {
 
     private final UserRepository userRepository;
 
-    // Configuration
+    
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final int LOCKOUT_DURATION_MINUTES = 30;
 
-    // Record failed login attempt
+    
     @Transactional
     public void recordFailedLogin(String email) {
         userRepository.findByEmail(email).ifPresent(user -> {
@@ -30,7 +30,7 @@ public class AccountLockoutService {
 
             log.warn("Failed login attempt {} for user: {}", attempts, email);
 
-            // Lock account if max attempts reached
+            
             if (attempts >= MAX_FAILED_ATTEMPTS) {
                 user.setAccountLocked(true);
                 user.setLockoutTime(LocalDateTime.now());
@@ -41,7 +41,7 @@ public class AccountLockoutService {
         });
     }
 
-    // Reset failed attempts on successful login
+    
     @Transactional
     public void resetFailedAttempts(String email) {
         userRepository.findByEmail(email).ifPresent(user -> {
@@ -53,19 +53,19 @@ public class AccountLockoutService {
         });
     }
 
-    // Check if account is locked
+
     public void checkAccountLock(User user) {
         if (user.isAccountLocked()) {
-            // Check if lockout period has expired
+            
             if (user.getLockoutTime() != null) {
                 LocalDateTime unlockTime = user.getLockoutTime().plusMinutes(LOCKOUT_DURATION_MINUTES);
                 
                 if (LocalDateTime.now().isAfter(unlockTime)) {
-                    // Unlock account automatically
+                    
                     unlockAccount(user.getEmail());
                     log.info("Account automatically unlocked for user: {}", user.getEmail());
                 } else {
-                    // Still locked
+                    
                     long minutesRemaining = java.time.Duration.between(
                         LocalDateTime.now(), unlockTime
                     ).toMinutes();
@@ -79,7 +79,7 @@ public class AccountLockoutService {
         }
     }
 
-    // Unlock account manually (admin)
+
     @Transactional
     public void unlockAccount(String email) {
         userRepository.findByEmail(email).ifPresent(user -> {
@@ -91,7 +91,7 @@ public class AccountLockoutService {
         });
     }
 
-    // Get lockout status
+    
     public String getLockoutStatus(String email) {
         return userRepository.findByEmail(email)
             .map(user -> {
