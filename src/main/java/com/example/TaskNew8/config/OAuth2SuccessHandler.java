@@ -47,7 +47,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             return;
         }
 
-        // Create or fetch existing user
+     
         User user = userRepository.findByEmail(email).orElseGet(() -> {
             String[] nameParts = name != null ? name.split(" ", 2) : new String[]{"", ""};
             
@@ -55,7 +55,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     .email(email)
                     .firstName(nameParts.length > 0 ? nameParts[0] : "")
                     .lastName(nameParts.length > 1 ? nameParts[1] : "")
-                    .password("") // OAuth users don't have password
+                    .password("") 
                     .role(Role.USER)
                     .emailVerified(true)
                     .twoFactorEnabled(false)
@@ -65,17 +65,17 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             return userRepository.save(newUser);
         });
 
-        // Generate tokens
+   
         String accessToken = jwtService.generateAccessToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
         log.info("Tokens generated for OAuth user: {}", user.getEmail());
 
-        // Encode tokens safely
+   
         String encodedAccess = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
         String encodedRefresh = URLEncoder.encode(refreshToken.getToken(), StandardCharsets.UTF_8);
 
-        // Redirect to success page with tokens
+        
         String redirectUrl = "/success.html?accessToken=" + encodedAccess + "&refreshToken=" + encodedRefresh;
 
         response.sendRedirect(redirectUrl);
