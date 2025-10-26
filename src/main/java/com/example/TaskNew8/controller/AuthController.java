@@ -63,22 +63,22 @@ public class AuthController {
         if (authentication != null && authentication.getPrincipal() instanceof User) {
             User user = (User) authentication.getPrincipal();
             
-            // Get token from request
+            
             String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
                 
-                // Get token expiration
+               
                 LocalDateTime expiresAt = jwtService.getTokenExpiration(token);
                 
-                // Blacklist the token
+             
                 tokenBlacklistService.blacklistToken(token, expiresAt, "LOGOUT");
             }
             
-            // Delete refresh token
+           
             refreshTokenService.deleteByUserId(user.getId());
             
-            // Clear security context
+       
             SecurityContextHolder.clearContext();
             
             return ResponseEntity.ok("Logout successful. Token invalidated.");
@@ -87,7 +87,7 @@ public class AuthController {
         return ResponseEntity.badRequest().body("Invalid authentication.");
     }
 
-    // PASSWORD RESET ENDPOINTS
+   
     
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
@@ -101,7 +101,7 @@ public class AuthController {
         return ResponseEntity.ok(message);
     }
 
-    // EMAIL VERIFICATION ENDPOINTS
+   
     
     @GetMapping("/verify-email")
     public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
@@ -115,7 +115,7 @@ public class AuthController {
         return ResponseEntity.ok(message);
     }
 
-    // 2FA LOGIN
+   
     @PostMapping("/login/2fa")
     public ResponseEntity<AuthResponse> loginWith2FA(
             @Valid @RequestBody LoginRequest request,
