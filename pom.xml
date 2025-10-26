@@ -50,7 +50,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-	<!-- Two-Factor Authentication (TOTP) -->
+
 <dependency>
     <groupId>dev.samstevens.totp</groupId>
     <artifactId>totp</artifactId>
@@ -91,30 +91,30 @@
     <artifactId>jjwt-jackson</artifactId>
     <version>0.12.5</version>
 </dependency>
-<!-- Spring Security OAuth2 -->
+
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-oauth2-client</artifactId>
 </dependency>
 
-<!-- JWT for OAuth -->
+
 <dependency>
     <groupId>org.springframework.security</groupId>
     <artifactId>spring-security-oauth2-jose</artifactId>
 </dependency>
-<!-- Email Support -->
+
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-mail</artifactId>
 </dependency>
-<!-- Rate Limiting -->
+
 <dependency>
     <groupId>com.bucket4j</groupId>
     <artifactId>bucket4j-core</artifactId>
     <version>8.1.0</version>
 </dependency>
 
-<!-- Caffeine Cache for storing rate limit buckets -->
+
 <dependency>
     <groupId>com.github.ben-manes.caffeine</groupId>
     <artifactId>caffeine</artifactId>
