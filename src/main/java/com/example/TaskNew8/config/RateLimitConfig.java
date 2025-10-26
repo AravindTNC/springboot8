@@ -22,7 +22,7 @@ public class RateLimitConfig {
     }
 
     private Bucket createNewBucket(String key) {
-        // Allow 100 requests per minute
+       
         Bandwidth limit = Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1)));
         return Bucket.builder()
                 .addLimit(limit)
