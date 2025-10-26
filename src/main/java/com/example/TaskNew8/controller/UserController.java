@@ -26,7 +26,7 @@ import com.example.TaskNew8.model.User;
 public class UserController {
     
     private final UserService userService;
-    // And add to constructor
+    
 private final AccountLockoutService accountLockoutService;
 private final UserRepository userRepository;
 
@@ -149,9 +149,7 @@ private final UserRepository userRepository;
         return ResponseEntity.ok(response);
     }
 
-    // Add to UserController
-
-// Unlock user account (Admin only)
+  
 @PostMapping("/admin/users/{userId}/unlock")
 @PreAuthorize("hasRole('ADMIN')")
 public ResponseEntity<Map<String, String>> unlockUserAccount(@PathVariable Long userId) {
@@ -165,7 +163,7 @@ public ResponseEntity<Map<String, String>> unlockUserAccount(@PathVariable Long 
     return ResponseEntity.ok(response);
 }
 
-// Get account lockout status (Admin only)
+
 @GetMapping("/admin/users/{userId}/lockout-status")
 @PreAuthorize("hasRole('ADMIN')")
 public ResponseEntity<Map<String, String>> getLockoutStatus(@PathVariable Long userId) {
