@@ -17,14 +17,14 @@ public class TokenBlacklistService {
 
     private final BlacklistedTokenRepository blacklistedTokenRepository;
 
-    // Add token to blacklist
+    
     @Transactional
     public void blacklistToken(String token, LocalDateTime expiresAt, String reason) {
         if (token == null || token.isEmpty()) {
             return;
         }
 
-        // Check if already blacklisted
+        
         if (blacklistedTokenRepository.existsByToken(token)) {
             log.info("Token already blacklisted");
             return;
@@ -41,7 +41,7 @@ public class TokenBlacklistService {
         log.info("Token blacklisted. Reason: {}", reason);
     }
 
-    // Check if token is blacklisted
+    
     public boolean isTokenBlacklisted(String token) {
         if (token == null || token.isEmpty()) {
             return false;
@@ -49,7 +49,7 @@ public class TokenBlacklistService {
         return blacklistedTokenRepository.existsByToken(token);
     }
 
-    // Cleanup expired tokens - runs daily at 4 AM
+    
     @Scheduled(cron = "0 0 4 * * ?")
     @Transactional
     public void cleanupExpiredTokens() {
